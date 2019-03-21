@@ -2,7 +2,7 @@
 // UNIVASF- Universidade Federal do Vale do São Francisco
 // Disciplina: Computação Gráfica
 // Docente: Jorge Cavalcanti
-// Discentes: Djeysi Kathleen Alves, Victor Gabriel Ferreira Barbosa.
+// Discentes: Djeysi Kathleen Alves, Victor Gabriel Ferreira Barbosa, Jorge Gomes .
 // Semestre: 2018.2
 //
 // labirinto:
@@ -26,7 +26,7 @@ int direitaPrecionado = 0;
 int esquerdaPrecionado = 0;
 int backupTy = 0;
 int auxTx =0;
-int colidiu =0;
+int colidiu[nlinhas] = {0,0};
 int countDir = 0;
 // Variáveis que guardam a translação que será aplicada 
 // sobre a casinha
@@ -100,21 +100,24 @@ void carregarTextura(GLuint texture, const char* filename){
 	FreeImage_Unload(pImage);
 }
 
-void detectaColisao(struct objeto linha){
-    printf("\naq = %d\n",tri.y2);
-    printf("\nlinha = %d\n", linha.y2); 
+int detectaColisao(struct objeto linha){
+  //  printf("\naq = %d\n",tri.y2);
+  //  printf("\nlinha = %d\n", linha.y2); 
+    int colidiu = 0;
+    printf("\ncolidiu2 = %d\n", colidiu); 
    if(linha.y2 == tri.y2 && tri.x2 >= linha.x1 && tri.x1 <= linha.x2){
           tri.y1 = (y3 - y4) + linha.y2;
           Ty = tri.y1 - y3;
           colidiu = 1;
-          printf("\n colidiu\n");
+    //      printf("\n colidiu\n");
     }else{
-         colidiu = 0;
+        colidiu = 0;
     }
     if(tri.y1 >= linha.y1 && tri.y2 < linha.y2 && tri.x2 >= linha.x1 && tri.x1 <= linha.x2){
         subindo = 0;
-        printf("\nentrou aq");
+      //  printf("\nentrou aq");
     }
+    return colidiu;
 }
 
 
@@ -136,8 +139,8 @@ void Inicializa (void)
    fundo = coresFundo[i];
    objeto = coresObjeto[i];
 
-   linhas[0].x1 = 160;
-   linhas[0].x2 = 210;
+   linhas[0].x1 = 200;
+   linhas[0].x2 = 270;
    linhas[0].y1 = 45;
    linhas[0].y2 = 65;
    
@@ -198,7 +201,7 @@ void desenhaTriangulo(){
    
    for(i = 0; i < nlinhas; i++)
    {
-      detectaColisao(linhasAux[i]);
+      colidiu[i]  = detectaColisao(linhasAux[i]);
    }
    
 }
@@ -222,7 +225,8 @@ void DesenhaTexto(char *p)
 void Desenha(void)
 {
        //1 mudança
-   
+   int flag = 0;
+
    coresParedes[0].r = 0;
    coresParedes[0].g = 0; //parede preto.
    coresParedes[0].b = 0;
@@ -349,13 +353,24 @@ void Desenha(void)
    }else{
     direitaPrecionado = 0;
     esquerdaPrecionado = 0;
-    if(Ty > (backupTy + 8) && !subindo && !colidiu){
+
+    for(int i = 0; i < nlinhas; i++)
+    {
+        if(colidiu[i]){
+            flag = 1;
+            break;
+        }
+    }
+    
+    
+    if(Ty > (backupTy + 8) && !subindo && !flag){
             Ty-=15;
             count += xStep; 
+            printf("\n entrou aq\n");
             //auxTx = 0;
     }else{
             pulando = 0;
-            if(!colidiu)
+            if(!flag)
                 Ty = backupTy;
             auxTx = animaX - count;
         }
