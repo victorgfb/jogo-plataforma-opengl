@@ -17,7 +17,7 @@
 #define yStep 1 //incremento no eixo y
 #define maxY 125 //valor máximo do eixo Y
 #define maxX 105 //valor máximo do eixo X
-#define nlinhas 2
+#define nblocos 2
 static GLuint texturasObjeto[3] = {1,2,3};
 static GLuint texture = 0;
     
@@ -26,7 +26,7 @@ int direitaPrecionado = 0;
 int esquerdaPrecionado = 0;
 int backupTy = 0;
 int auxTx =0;
-int colidiu[nlinhas] = {0,0};
+int colidiu[nblocos] = {0,0};
 int countDir = 0;
 // Variáveis que guardam a translação que será aplicada 
 // sobre a casinha
@@ -69,7 +69,7 @@ struct cor objeto;
 struct cor coresParedes[nCores];
 struct cor coresFundo[nCores];
 struct cor coresObjeto[nCores];
-struct objeto linhas[nlinhas], tri,  linhasAux[nlinhas];
+struct objeto blocos[nblocos], tri,  blocosAux[nblocos];
 int i = 0;
 
 void Anima(int value)
@@ -139,16 +139,16 @@ void Inicializa (void)
    fundo = coresFundo[i];
    objeto = coresObjeto[i];
 
-   linhas[0].x1 = 200;
-   linhas[0].x2 = 270;
-   linhas[0].y1 = 45;
-   linhas[0].y2 = 65;
+   blocos[0].x1 = 200;
+   blocos[0].x2 = 270;
+   blocos[0].y1 = 45;
+   blocos[0].y2 = 65;
    
 
-   linhas[1].x1 = 90;
-   linhas[1].x2 = 150;
-   linhas[1].y1 = 45;
-   linhas[1].y2 = 65;
+   blocos[1].x1 = 90;
+   blocos[1].x2 = 150;
+   blocos[1].y1 = 45;
+   blocos[1].y2 = 65;
 
    
    // Define a cor de fundo da janela de visualização como branco
@@ -199,9 +199,9 @@ void desenhaTriangulo(){
    glDisable(GL_TEXTURE_2D);
    
    
-   for(i = 0; i < nlinhas; i++)
+   for(i = 0; i < nblocos; i++)
    {
-      colidiu[i]  = detectaColisao(linhasAux[i]);
+      colidiu[i]  = detectaColisao(blocosAux[i]);
    }
    
 }
@@ -300,19 +300,19 @@ void Desenha(void)
    if(countDir == 2)
             countDir = 0;
 
-   linhasAux[1].x1 = linhas[1].x1 - animaX;
-   linhasAux[1].x2 = linhas[1].x2 - animaX;
-   linhasAux[1].y1 = linhas[1].y1;
-   linhasAux[1].y2 = linhas[1].y2;
-   linhasAux[0].x1 = linhas[0].x1 -animaX;
-   linhasAux[0].x2 = linhas[0].x2 - animaX;
-   linhasAux[0].y1 = linhas[0].y1;
-   linhasAux[0].y2 = linhas[0].y2;
+   blocosAux[1].x1 = blocos[1].x1 - animaX;
+   blocosAux[1].x2 = blocos[1].x2 - animaX;
+   blocosAux[1].y1 = blocos[1].y1;
+   blocosAux[1].y2 = blocos[1].y2;
+   blocosAux[0].x1 = blocos[0].x1 -animaX;
+   blocosAux[0].x2 = blocos[0].x2 - animaX;
+   blocosAux[0].y1 = blocos[0].y1;
+   blocosAux[0].y2 = blocos[0].y2;
    
    glColor3f(0,1,0);
    glBegin(GL_QUADS);
-   glVertex2f(linhasAux[0].x1 , linhas[0].y1);
-   glVertex2f(linhasAux[0].x1 , linhas[0].y2);
+   glVertex2f(blocosAux[0].x1 , blocos[0].y1);
+   glVertex2f(blocosAux[0].x1 , linhas[0].y2);
    glVertex2f(linhasAux[0].x2 , linhas[0].y2);
    glVertex2f(linhasAux[0].x2 , linhas[0].y1);
    glEnd();
