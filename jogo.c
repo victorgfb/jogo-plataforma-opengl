@@ -1,0 +1,486 @@
+//*****************************************************
+// UNIVASF- Universidade Federal do Vale do São Francisco
+// Disciplina: Computação Gráfica
+// Docente: Jorge Cavalcanti
+// Discentes: Djeysi Kathleen Alves, Victor Gabriel Ferreira Barbosa.
+// Semestre: 2018.2
+//
+// labirinto:
+//*****************************************************
+
+#define nCores 3
+#include <stdlib.h>
+#include <stdio.h>
+#include <GL/glut.h>
+#include <FreeImage.h>
+#define xStep 1 //incremento no eixo x
+#define yStep 1 //incremento no eixo y
+#define maxY 125 //valor máximo do eixo Y
+#define maxX 105 //valor máximo do eixo X
+#define nlinhas 2
+static GLuint texturasObjeto[3] = {1,2,3};
+static GLuint texture = 0;
+    
+int subindo = 0;
+int direitaPrecionado = 0;
+int esquerdaPrecionado = 0;
+int backupTy = 0;
+int auxTx =0;
+int colidiu =0;
+int countDir = 0;
+// Variáveis que guardam a translação que será aplicada 
+// sobre a casinha
+int Tx=0;
+int Ty=0;
+int pulando;
+int animaX = 0;
+int acabou = 0;
+int count = 0;
+
+// Variáveis que guardam os valores mínimos de x e y da 
+// casinha
+GLfloat minX;
+GLfloat minY;
+
+// Variáveis que guardam a largura e altura da janela
+GLfloat windowXmin, windowXmax;
+GLfloat windowYmin, windowYmax;
+
+//Variáveis que guardam os vértices do triangulo
+int x1,x2,x3,x4;
+
+int y4,y2,y3,y5;
+
+struct cor
+{
+   float r;
+   float g;
+   float b;
+};
+
+struct objeto
+{
+   int x1,x2,y1,y2;
+};
+
+struct cor fundo;
+struct cor paredes;
+struct cor objeto;
+struct cor coresParedes[nCores];
+struct cor coresFundo[nCores];
+struct cor coresObjeto[nCores];
+struct objeto linhas[nlinhas], tri,  linhasAux[nlinhas];
+int i = 0;
+
+void Anima(int value)
+{
+    animaX += xStep;
+	//Ty += yStep;
+
+	// Redesenha a casinha em outra posição
+	glutPostRedisplay();
+	glutTimerFunc(150,Anima, 1);
+}
+
+void carregarTextura(GLuint texture, const char* filename){
+
+	FIBITMAP *pImage = FreeImage_Load( FIF_PNG, filename, PNG_DEFAULT);
+    int nWidth = FreeImage_GetWidth(pImage);
+    int nHeight = FreeImage_GetHeight(pImage);
+
+    
+	glBindTexture(GL_TEXTURE_2D, texture);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, nWidth, nHeight, 0, GL_BGRA, GL_UNSIGNED_BYTE, (void*)FreeImage_GetBits(pImage));
+	
+	glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_ADD);
+
+	FreeImage_Unload(pImage);
+}
+
+void detectaColisao(struct objeto linha){
+    printf("\naq = %d\n",tri.y2);
+    printf("\nlinha = %d\n", linha.y2); 
+   if(linha.y2 == tri.y2 && tri.x2 >= linha.x1 && tri.x1 <= linha.x2){
+          tri.y1 = (y3 - y4) + linha.y2;
+          Ty = tri.y1 - y3;
+          colidiu = 1;
+          printf("\n colidiu\n");
+    }else{
+         colidiu = 0;
+    }
+    if(tri.y1 >= linha.y1 && tri.y2 < linha.y2 && tri.x2 >= linha.x1 && tri.x1 <= linha.x2){
+        subindo = 0;
+        printf("\nentrou aq");
+    }
+}
+
+
+void carregarImagens(void){
+	glGenTextures(3, texturasObjeto);
+    carregarTextura(texturasObjeto[0], "imagem/sprite_05.png");
+	carregarTextura(texturasObjeto[1], "imagem/sprite_06.png");
+    carregarTextura(texturasObjeto[2], "imagem/sprite_07.png");
+    carregarTextura(texturasObjeto[4], "imagem/sprite_01.png");
+    carregarTextura(texturasObjeto[5], "imagem/sprite_00.png");
+}
+
+void Inicializa (void)
+{
+    
+   FreeImage_Initialise(true);
+
+   paredes = coresParedes[i];
+   fundo = coresFundo[i];
+   objeto = coresObjeto[i];
+
+   linhas[0].x1 = 160;
+   linhas[0].x2 = 210;
+   linhas[0].y1 = 45;
+   linhas[0].y2 = 65;
+   
+
+   linhas[1].x1 = 90;
+   linhas[1].x2 = 150;
+   linhas[1].y1 = 45;
+   linhas[1].y2 = 65;
+
+   
+   // Define a cor de fundo da janela de visualização como branco
+
+   glClearColor(1.0f, 1.0f, 1.0f, 0.0f);
+   x1 = 0;
+   x2 = 9;
+   x3 = 9;
+   x4 = 0;
+   y4 = 20;
+   y2 = 20;
+   y3 = 30;
+   y5 = 30;
+
+   glClearColor(fundo.r, fundo.g, fundo.b, 0.0f);
+
+
+   // Define a janela de visualização 2D
+   glMatrixMode(GL_PROJECTION);
+   gluOrtho2D(0.0,maxX,0.0,maxY);
+   glMatrixMode(GL_MODELVIEW); //para n manipular a matriz de projeção
+   carregarImagens();
+}
+
+
+void desenhaTriangulo(){
+   tri.x1 =  x1 + Tx - auxTx;
+   tri.x2 =  x2 + Tx - auxTx;
+
+   //if(!colidiu){
+        tri.y1 = y3 + Ty;
+        tri.y2 = y4 + Ty;
+   //}
+   glColor3f(0,0,0);  
+   glEnable(GL_BLEND);
+   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+   glEnable(GL_TEXTURE_2D);
+   glBegin(GL_QUADS);
+   glTexCoord2f(0.0f,0.0f);
+   glVertex2f(tri.x1, tri.y2);
+   glTexCoord2f(1.0f,0.0f); 
+   glVertex2f(tri.x2, tri.y2);
+   glTexCoord2f(1.0f,1.0f);
+   glVertex2f(tri.x2, tri.y1);
+   glTexCoord2f(0.0f,1.0f);
+   glVertex2f(tri.x1, tri.y1);
+   glEnd();
+   glDisable(GL_TEXTURE_2D);
+   
+   
+   for(i = 0; i < nlinhas; i++)
+   {
+      detectaColisao(linhasAux[i]);
+   }
+   
+}
+
+void DesenhaTextoStroke(char *string) 
+{  
+	// Exibe caractere a caractere
+	while(*string)
+		glutStrokeCharacter(GLUT_STROKE_MONO_ROMAN,*string++); 
+}
+
+void DesenhaTexto(char *p) 
+{
+	// Exibe caractere a caractere
+        while (*p != '\0') {
+            glutBitmapCharacter(GLUT_BITMAP_TIMES_ROMAN_24, *p++);
+        }
+}
+
+   // Função callback chamada para fazer o desenho
+void Desenha(void)
+{
+       //1 mudança
+   
+   coresParedes[0].r = 0;
+   coresParedes[0].g = 0; //parede preto.
+   coresParedes[0].b = 0;
+
+   coresFundo[0].r = 1; 
+   coresFundo[0].g = 1; //fundo branco.
+   coresFundo[0].b = 1;
+
+   coresObjeto[0].r = 1;
+   coresObjeto[0].g = 0;//objeto vermelho
+   coresObjeto[0].b = 0;
+
+   paredes = coresParedes[0];
+   fundo = coresFundo[0];
+   objeto = coresObjeto[0];
+   
+     //Tx += xStep;
+   // Muda para o sistema de coordenadas do modelo
+   glMatrixMode(GL_MODELVIEW);
+   // Inicializa a matriz de transformação corrente
+   glLoadIdentity();
+ 
+   
+   glClearColor(fundo.r, fundo.g, fundo.b, 0.0f);
+
+   //Limpa a janela de visualização com a cor de fundo especificada
+   glClear(GL_COLOR_BUFFER_BIT);
+   
+   
+   // Define a cor de desenho: preto
+   glColor3f(paredes.r,paredes.g,paredes.b);
+ 
+   
+   glBindTexture(GL_TEXTURE_2D, texturasObjeto[4]);
+   glColor3f(0,0,0);  
+   glEnable(GL_BLEND);
+   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+   glEnable(GL_TEXTURE_2D);
+   glBegin(GL_QUADS);
+   glTexCoord2f(0.0f,0.0f);
+   glVertex2f(0 - animaX,0);
+   glTexCoord2f(1.0f,0.0f); 
+   glVertex2f(105 - animaX, 0);
+   glTexCoord2f(1.0f,1.0f);
+   glVertex2f(105 - animaX, 105);
+   glTexCoord2f(0.0f,1.0f);
+   glVertex2f(0 - animaX, 105);
+   glEnd();
+   glDisable(GL_TEXTURE_2D);
+   
+   glBindTexture(GL_TEXTURE_2D, texturasObjeto[5]);
+   glColor3f(0,0,0);  
+   glEnable(GL_BLEND);
+   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+   glEnable(GL_TEXTURE_2D);
+   glBegin(GL_QUADS);
+   glTexCoord2f(0.0f,0.0f);
+   glVertex2f(105 - animaX,0);
+   glTexCoord2f(1.0f,0.0f); 
+   glVertex2f(210 - animaX, 0);
+   glTexCoord2f(1.0f,1.0f);
+   glVertex2f(210 - animaX, 105);
+   glTexCoord2f(0.0f,1.0f);
+   glVertex2f(105 - animaX, 105);
+   glEnd();
+   glDisable(GL_TEXTURE_2D);
+   
+  
+   glBindTexture(GL_TEXTURE_2D, texturasObjeto[countDir]);
+
+   if(countDir == 2)
+            countDir = 0;
+
+   linhasAux[1].x1 = linhas[1].x1 - animaX;
+   linhasAux[1].x2 = linhas[1].x2 - animaX;
+   linhasAux[1].y1 = linhas[1].y1;
+   linhasAux[1].y2 = linhas[1].y2;
+   linhasAux[0].x1 = linhas[0].x1 -animaX;
+   linhasAux[0].x2 = linhas[0].x2 - animaX;
+   linhasAux[0].y1 = linhas[0].y1;
+   linhasAux[0].y2 = linhas[0].y2;
+   
+   glColor3f(0,1,0);
+   glBegin(GL_QUADS);
+   glVertex2f(linhasAux[0].x1 , linhas[0].y1);
+   glVertex2f(linhasAux[0].x1 , linhas[0].y2);
+   glVertex2f(linhasAux[0].x2 , linhas[0].y2);
+   glVertex2f(linhasAux[0].x2 , linhas[0].y1);
+   glEnd();
+      
+   glColor3f(0,1,0);
+   glBegin(GL_QUADS);
+   glVertex2f(linhasAux[1].x1, linhas[1].y1);
+   glVertex2f(linhasAux[1].x1, linhas[1].y2);
+   glVertex2f(linhasAux[1].x2 , linhas[1].y2);
+   glVertex2f(linhasAux[1].x2 , linhas[1].y1);
+   glEnd();
+   
+  
+//    glColor3f(objeto.r,objeto.g,objeto.b);
+   
+   glPushMatrix();  
+   
+   glTranslatef(1,1,0.0f);
+   
+   if(subindo){
+       //printf("%d", Ty - backupTy);
+       
+    if((Ty - backupTy) <=60) {
+            Ty+=15;
+            count += xStep; 
+            //glutPostRedisplay();
+    }else{
+        if(direitaPrecionado == 1){
+            Tx += 10;
+            direitaPrecionado = 0;
+        }
+        if(esquerdaPrecionado == 1){
+            Tx -= 10;
+            esquerdaPrecionado = 0;
+        }
+        subindo = 0;
+    }
+   }else{
+    direitaPrecionado = 0;
+    esquerdaPrecionado = 0;
+    if(Ty > (backupTy + 8) && !subindo && !colidiu){
+            Ty-=15;
+            count += xStep; 
+            //auxTx = 0;
+    }else{
+            pulando = 0;
+            if(!colidiu)
+                Ty = backupTy;
+            auxTx = animaX - count;
+        }
+   }
+  
+   desenhaTriangulo();
+   
+    glutSwapBuffers();
+}
+
+
+// Função callback chamada para gerenciar eventos do teclado   
+// para teclas especiais, tais como F1, PgDn e Home
+void TeclasEspeciais(int key, int x, int y)
+{
+   int i;
+   
+    if(acabou == 1){
+        if(key != GLUT_KEY_HOME){
+            return;
+        }else{
+             acabou = 0;
+        }
+    }
+   
+   if(key == GLUT_KEY_UP && !pulando) {
+      pulando = 1;
+      subindo = 1;
+      backupTy = 0;
+
+   }
+    
+   if(key == GLUT_KEY_DOWN) {
+      Ty -= yStep;
+   }
+    
+   if(key == GLUT_KEY_RIGHT) {
+        countDir++;
+        if(subindo){
+            direitaPrecionado = 1;
+            Tx += 10;
+            subindo = 0;
+        }else{
+            Tx += xStep;
+        }
+   }
+   
+   if(key == GLUT_KEY_LEFT) {
+         if(subindo){
+            direitaPrecionado = 1;
+            Tx -= 10;
+            subindo = 0;
+        }else{
+            Tx -= xStep;
+        }
+   }
+   
+   
+    glutPostRedisplay();
+  
+}
+   
+
+void AlteraTamanhoJanela(GLsizei w, GLsizei h)
+{
+	GLsizei largura, altura;
+
+	// Evita a divisao por zero
+	if(h == 0) h = 1;
+
+	// Atualiza as variáveis
+	largura = w;
+	altura = h;
+
+	// Especifica as dimensões da Viewport
+	glViewport(0, 0, largura, altura);
+
+	// Inicializa o sistema de coordenadas de projeção
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+
+	// Estabelece a janela de seleção (esquerda, direita, inferior, 
+	// superior) mantendo a proporção com a janela de visualização
+	if (largura <= altura) 
+	{
+		gluOrtho2D (0.0f, 105.0f, 0.0f*altura/largura, 125.0f*altura/largura);
+		windowXmin = 0.0f;
+		windowXmax =  105.0f;
+		windowYmin = 0.0f*altura/largura;
+		windowYmax = 125.0f*altura/largura;
+	}
+	else
+	{ 
+		gluOrtho2D (0.0f*largura/altura, 105.0f*largura/altura, 0.0f, 125.0f);
+		windowXmin = 0.0f*largura/altura;
+		windowXmax =  105.0f*largura/altura;
+		windowYmin = 0.0f;
+		windowYmax =  125.0f;
+	}
+}
+
+void Teclado (unsigned char key, int x, int y)
+{
+   if (key == 27)
+   exit(0);
+}
+
+// Programa Principal
+int main(int argc, char** argv)
+{
+   glutInit(&argc,argv);
+   glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA);
+   glutInitWindowPosition(5,5); // Especifica a posição inicial da janela GLUT
+   glutInitWindowSize(400,400); // Especifica o tamanho inicial em pixels da janela GLUT
+   glutCreateWindow("mario");
+   glutDisplayFunc(Desenha);
+   glutReshapeFunc(AlteraTamanhoJanela); // Registra a função callback de redimensionamento da janela de visualização
+   glutKeyboardFunc (Teclado);
+   glutSpecialFunc(TeclasEspeciais);
+
+   // Registra a função callback que será chamada a cada intervalo de tempo
+   glutTimerFunc(150, Anima, 1);
+   
+   Inicializa();
+   glutMainLoop();
+   
+}
+  
