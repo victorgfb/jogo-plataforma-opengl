@@ -18,13 +18,13 @@
 #define maxY 125 //valor máximo do eixo Y
 #define maxX 105 //valor máximo do eixo X
 #define nblocos 2
-static GLuint texturasObjeto[5] = {1,2,3,4,5};
+static GLuint texturasObjeto[8];
 static GLuint texture = 0;
 int auxiliar[nblocos] = {0,0};
 int aux1[nblocos] = {0,0};
 int diff[nblocos] = {0,0};
 int subindo = 0;
-int direitaPrecionado = 0;
+int ladoPrecionado = 0;
 int esquerdaPrecionado = 0;
 int backupTy = 0;
 int auxTx =0;
@@ -124,12 +124,19 @@ int detectaColisao(struct objeto linha){
 
 
 void carregarImagens(void){
-	glGenTextures(3, texturasObjeto);
+	glGenTextures(11, texturasObjeto);
     carregarTextura(texturasObjeto[0], "imagem/sprite_05.png");
 	carregarTextura(texturasObjeto[1], "imagem/sprite_06.png");
     carregarTextura(texturasObjeto[2], "imagem/sprite_07.png");
-    carregarTextura(texturasObjeto[4], "imagem/sprite_01.png");
-    carregarTextura(texturasObjeto[5], "imagem/sprite_00.png");
+    carregarTextura(texturasObjeto[3], "imagem/sprite_08.png");
+    carregarTextura(texturasObjeto[4], "imagem/sprite_09.png");
+    carregarTextura(texturasObjeto[5], "imagem/sprite_10.png");
+    carregarTextura(texturasObjeto[6], "imagem/sprite_01.png");
+    carregarTextura(texturasObjeto[8], "imagem/sprite_11.png");
+    carregarTextura(texturasObjeto[9], "imagem/sprite_12.png");
+    carregarTextura(texturasObjeto[10], "imagem/sprite_13.png");
+    carregarTextura(texturasObjeto[11], "imagem/sprite_14.png");
+    carregarTextura(texturasObjeto[7], "imagem/sprite_00.png");
 }
 
 void Inicializa (void)
@@ -262,7 +269,7 @@ void Desenha(void)
    glColor3f(paredes.r,paredes.g,paredes.b);
  
    
-   glBindTexture(GL_TEXTURE_2D, texturasObjeto[4]);
+   glBindTexture(GL_TEXTURE_2D, texturasObjeto[6]);
    glColor3f(0,0,0);  
    glEnable(GL_BLEND);
    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -279,7 +286,7 @@ void Desenha(void)
    glEnd();
    glDisable(GL_TEXTURE_2D);
    
-   glBindTexture(GL_TEXTURE_2D, texturasObjeto[4]);
+   glBindTexture(GL_TEXTURE_2D, texturasObjeto[6]);
    glColor3f(0,0,0);  
    glEnable(GL_BLEND);
    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -296,7 +303,7 @@ void Desenha(void)
    glEnd();
    glDisable(GL_TEXTURE_2D);
    
-   glBindTexture(GL_TEXTURE_2D, texturasObjeto[5]);
+   glBindTexture(GL_TEXTURE_2D, texturasObjeto[7]);
    glColor3f(0,0,0);  
    glEnable(GL_BLEND);
    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -315,9 +322,6 @@ void Desenha(void)
    
   
    glBindTexture(GL_TEXTURE_2D, texturasObjeto[countDir]);
-
-   if(countDir == 2)
-            countDir = 0;
 
    blocosAux[1].x1 = blocos[1].x1 - animaX;
    blocosAux[1].x2 = blocos[1].x2 - animaX;
@@ -387,18 +391,19 @@ void Desenha(void)
             count += xStep; 
             //glutPostRedisplay();
     }else{
-        if(direitaPrecionado == 1){
+        if(ladoPrecionado == 1){
             Tx += 10;
-            direitaPrecionado = 0;
+            ladoPrecionado = 0;
         }
         if(esquerdaPrecionado == 1){
             Tx -= 10;
             esquerdaPrecionado = 0;
         }
         subindo = 0;
+        countDir = 10;
     }
    }else{
-    direitaPrecionado = 0;
+    ladoPrecionado = 0;
     esquerdaPrecionado = 0;
 
     for(int i = 0; i < nblocos; i++)
@@ -412,9 +417,7 @@ void Desenha(void)
     
     if(Ty > (backupTy + 8) && !subindo && !flag){
             Ty-=15;
-            count += xStep; 
-            printf("\n entrou aq\n");
-            //auxTx = 0;
+            count += xStep;
     }else{
             pulando = 0;
             if(!flag)
@@ -447,7 +450,11 @@ void TeclasEspeciais(int key, int x, int y)
       pulando = 1;
       subindo = 1;
       backupTy = 0;
-
+      if(countDir <= 2){
+        countDir = 8;
+      }else{
+        countDir = 9;  
+      }
    }
     
    if(key == GLUT_KEY_DOWN) {
@@ -456,8 +463,12 @@ void TeclasEspeciais(int key, int x, int y)
     
    if(key == GLUT_KEY_RIGHT) {
         countDir++;
+        
+        if(countDir > 2)
+            countDir = 0;
+
         if(subindo){
-            direitaPrecionado = 1;
+            ladoPrecionado = 1;
             Tx += 10;
             subindo = 0;
         }else{
@@ -466,8 +477,15 @@ void TeclasEspeciais(int key, int x, int y)
    }
    
    if(key == GLUT_KEY_LEFT) {
+         if(countDir <= 2){
+             countDir = 3;
+         }else{
+             countDir++;
+             if(countDir > 5)
+                countDir = 3;
+         }
          if(subindo){
-            direitaPrecionado = 1;
+            ladoPrecionado = 1;
             Tx -= 10;
             subindo = 0;
         }else{
