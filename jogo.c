@@ -18,7 +18,7 @@
 #define maxY 125 //valor máximo do eixo Y
 #define maxX 105 //valor máximo do eixo X
 #define nblocos 2
-static GLuint texturasObjeto[3] = {1,2,3};
+static GLuint texturasObjeto[5] = {1,2,3,4,5};
 static GLuint texture = 0;
     
 int subindo = 0;
@@ -36,7 +36,7 @@ int pulando;
 int animaX = 0;
 int acabou = 0;
 int count = 0;
-
+int aux1 = 0;
 // Variáveis que guardam os valores mínimos de x e y da 
 // casinha
 GLfloat minX;
@@ -269,11 +269,11 @@ void Desenha(void)
    glTexCoord2f(0.0f,0.0f);
    glVertex2f(0 - animaX,0);
    glTexCoord2f(1.0f,0.0f); 
-   glVertex2f(105 - animaX, 0);
+   glVertex2f(115 - animaX, 0);
    glTexCoord2f(1.0f,1.0f);
-   glVertex2f(105 - animaX, 105);
+   glVertex2f(115 - animaX, 115);
    glTexCoord2f(0.0f,1.0f);
-   glVertex2f(0 - animaX, 105);
+   glVertex2f(0 - animaX, 115);
    glEnd();
    glDisable(GL_TEXTURE_2D);
    
@@ -284,13 +284,13 @@ void Desenha(void)
    glEnable(GL_TEXTURE_2D);
    glBegin(GL_QUADS);
    glTexCoord2f(0.0f,0.0f);
-   glVertex2f(105 - animaX,0);
+   glVertex2f(115 - animaX,0);
    glTexCoord2f(1.0f,0.0f); 
    glVertex2f(210 - animaX, 0);
    glTexCoord2f(1.0f,1.0f);
-   glVertex2f(210 - animaX, 105);
+   glVertex2f(210 - animaX, 115);
    glTexCoord2f(0.0f,1.0f);
-   glVertex2f(105 - animaX, 105);
+   glVertex2f(115 - animaX, 115);
    glEnd();
    glDisable(GL_TEXTURE_2D);
    
@@ -312,18 +312,38 @@ void Desenha(void)
    glColor3f(0,1,0);
    glBegin(GL_QUADS);
    glVertex2f(blocosAux[0].x1 , blocos[0].y1);
-   glVertex2f(blocosAux[0].x1 , linhas[0].y2);
-   glVertex2f(linhasAux[0].x2 , linhas[0].y2);
-   glVertex2f(linhasAux[0].x2 , linhas[0].y1);
+   glVertex2f(blocosAux[0].x1 , blocos[0].y2);
+   glColor3f(1,0,0);
+   glVertex2f(blocosAux[0].x2 , blocos[0].y2);
+   glVertex2f(blocosAux[0].x2 , blocos[0].y1);
    glEnd();
       
+   
    glColor3f(0,1,0);
    glBegin(GL_QUADS);
-   glVertex2f(linhasAux[1].x1, linhas[1].y1);
-   glVertex2f(linhasAux[1].x1, linhas[1].y2);
-   glVertex2f(linhasAux[1].x2 , linhas[1].y2);
-   glVertex2f(linhasAux[1].x2 , linhas[1].y1);
+   glVertex2f(blocosAux[1].x1, blocos[1].y1);
+   glVertex2f(blocosAux[1].x1, blocos[1].y2);
+   glVertex2f(blocosAux[1].x2 , blocos[1].y2);
+   glVertex2f(blocosAux[1].x2 , blocos[1].y1);
    glEnd();
+   
+   if(colidiu[1]){
+        aux1 = tri.x2;
+    }else{
+        if(aux1 >= blocosAux[1].x2)
+            aux1 -= animaX; 
+    }
+    
+    if(aux1 != 0) {
+     glColor3f(1,0,0);
+        glBegin(GL_QUADS);
+        glVertex2f(blocosAux[1].x1, blocos[1].y1);
+        glVertex2f(blocosAux[1].x1, blocos[1].y2);
+        glVertex2f(aux1 , blocos[1].y2);
+        glVertex2f(aux1 , blocos[1].y1);
+        glEnd();
+    }
+  
    
   
 //    glColor3f(objeto.r,objeto.g,objeto.b);
@@ -354,7 +374,7 @@ void Desenha(void)
     direitaPrecionado = 0;
     esquerdaPrecionado = 0;
 
-    for(int i = 0; i < nlinhas; i++)
+    for(int i = 0; i < nblocos; i++)
     {
         if(colidiu[i]){
             flag = 1;
