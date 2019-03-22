@@ -20,7 +20,9 @@
 #define nblocos 2
 static GLuint texturasObjeto[5] = {1,2,3,4,5};
 static GLuint texture = 0;
-int auxiliar = 0;
+int auxiliar[nblocos] = {0,0};
+int aux1[nblocos] = {0,0};
+int diff[nblocos] = {0,0};
 int subindo = 0;
 int direitaPrecionado = 0;
 int esquerdaPrecionado = 0;
@@ -36,8 +38,7 @@ int pulando;
 int animaX = 0;
 int acabou = 0;
 int count = 0;
-int aux1 = 0;
-int diff = 0;
+
 // Variáveis que guardam os valores mínimos de x e y da 
 // casinha
 GLfloat minX;
@@ -227,7 +228,7 @@ void Desenha(void)
 {
        //1 mudança
    int flag = 0;
-
+   int x = 0;
    coresParedes[0].r = 0;
    coresParedes[0].g = 0; //parede preto.
    coresParedes[0].b = 0;
@@ -278,7 +279,7 @@ void Desenha(void)
    glEnd();
    glDisable(GL_TEXTURE_2D);
    
-   glBindTexture(GL_TEXTURE_2D, texturasObjeto[5]);
+   glBindTexture(GL_TEXTURE_2D, texturasObjeto[4]);
    glColor3f(0,0,0);  
    glEnable(GL_BLEND);
    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -292,6 +293,23 @@ void Desenha(void)
    glVertex2f(210 - animaX, 115);
    glTexCoord2f(0.0f,1.0f);
    glVertex2f(115 - animaX, 115);
+   glEnd();
+   glDisable(GL_TEXTURE_2D);
+   
+   glBindTexture(GL_TEXTURE_2D, texturasObjeto[5]);
+   glColor3f(0,0,0);  
+   glEnable(GL_BLEND);
+   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+   glEnable(GL_TEXTURE_2D);
+   glBegin(GL_QUADS);
+   glTexCoord2f(0.0f,0.0f);
+   glVertex2f(210 - animaX,0);
+   glTexCoord2f(1.0f,0.0f); 
+   glVertex2f(325 - animaX, 0);
+   glTexCoord2f(1.0f,1.0f);
+   glVertex2f(325 - animaX, 115);
+   glTexCoord2f(0.0f,1.0f);
+   glVertex2f(210 - animaX, 115);
    glEnd();
    glDisable(GL_TEXTURE_2D);
    
@@ -314,7 +332,6 @@ void Desenha(void)
    glBegin(GL_QUADS);
    glVertex2f(blocosAux[0].x1 , blocos[0].y1);
    glVertex2f(blocosAux[0].x1 , blocos[0].y2);
-   glColor3f(1,0,0);
    glVertex2f(blocosAux[0].x2 , blocos[0].y2);
    glVertex2f(blocosAux[0].x2 , blocos[0].y1);
    glEnd();
@@ -328,36 +345,35 @@ void Desenha(void)
    glVertex2f(blocosAux[1].x2 , blocos[1].y1);
    glEnd();
    
-   
-   if(colidiu[1]){
-       aux1 = tri.x2;
-       printf("\n aux1 = %d", aux1);
-       printf("\n auxiliar = %d", auxiliar);
-       if(aux1 >= auxiliar){
-            auxiliar = aux1;
-            diff = blocosAux[1].x2 - auxiliar;
-       }else{
-             auxiliar = blocosAux[1].x2 - diff;
-        }
-    }else{
-        if(aux1 !=0)
-            auxiliar = blocosAux[1].x2 - diff;
-    }
-    
-    if(auxiliar >= blocosAux[1].x2)
-            auxiliar = blocosAux[1].x2;
-    
-    if(auxiliar != 0) {
-     glColor3f(1,0,0);
-        glBegin(GL_QUADS);
-        glVertex2f(blocosAux[1].x1, blocos[1].y1);
-        glVertex2f(blocosAux[1].x1, blocos[1].y2);
-        glVertex2f(auxiliar , blocos[1].y2);
-        glVertex2f(auxiliar , blocos[1].y1);
-        glEnd();
-    }
-  
-   
+   for(x = 0; x< nblocos; x++){
+        if(colidiu[x]){
+            aux1[x] = tri.x2;
+            printf("\n aux1 = %d", aux1[x]);
+            printf("\n auxiliar = %d", auxiliar[x]);
+            if(aux1[x] >= auxiliar[x]){
+                    auxiliar[x] = aux1[x];
+                    diff[x] = blocosAux[x].x2 - auxiliar[x];
+            }else{
+                    auxiliar[x] = blocosAux[x].x2 - diff[x];
+                }
+            }else{
+                if(aux1[x] !=0)
+                    auxiliar[x] = blocosAux[x].x2 - diff[x];
+            }
+            
+            if(auxiliar[x] >= blocosAux[x].x2)
+                    auxiliar[x] = blocosAux[x].x2;
+            
+            if(auxiliar[x] != 0) {
+            glColor3f(1,0,0);
+                glBegin(GL_QUADS);
+                glVertex2f(blocosAux[x].x1, blocos[x].y1);
+                glVertex2f(blocosAux[x].x1, blocos[x].y2);
+                glVertex2f(auxiliar[x] , blocos[x].y2);
+                glVertex2f(auxiliar[x] , blocos[x].y1);
+                glEnd();
+            }
+   }
    
    glPushMatrix();  
    
