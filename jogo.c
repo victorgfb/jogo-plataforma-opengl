@@ -1,4 +1,4 @@
-//*****************************************************
+////*****************************************************
 // UNIVASF- Universidade Federal do Vale do São Francisco
 // Disciplina: Computação Gráfica
 // Docente: Jorge Cavalcanti
@@ -73,6 +73,26 @@ struct cor coresFundo[nCores];
 struct cor coresObjeto[nCores];
 struct objeto blocos[nblocos], tri,  blocosAux[nblocos];
 int i = 0;
+int timer = 0;
+
+void DesenhaTextoStroke() 
+{  
+    char *string;
+    char aux[12];
+    sprintf(aux, "%d", timer);
+    string = &aux[0];
+    glPushMatrix();
+    glColor3f(0,0,1);
+    glTranslatef(105, 105,0);
+  //  glScalef(0.09f,-0.08f,0);
+	// Exibe caractere a caractere
+	while(*string){
+        printf("\n%d",*string);
+    glutStrokeCharacter(GLUT_STROKE_MONO_ROMAN,*string++); 
+    }   
+     glPopMatrix();
+    timer++;
+}
 
 void Anima(int value)
 {
@@ -215,20 +235,6 @@ void desenhaTriangulo(){
    
 }
 
-void DesenhaTextoStroke(char *string) 
-{  
-	// Exibe caractere a caractere
-	while(*string)
-		glutStrokeCharacter(GLUT_STROKE_MONO_ROMAN,*string++); 
-}
-
-void DesenhaTexto(char *p) 
-{
-	// Exibe caractere a caractere
-        while (*p != '\0') {
-            glutBitmapCharacter(GLUT_BITMAP_TIMES_ROMAN_24, *p++);
-        }
-}
 
    // Função callback chamada para fazer o desenho
 void Desenha(void)
@@ -427,7 +433,7 @@ void Desenha(void)
    }
   
    desenhaTriangulo();
-   
+   // DesenhaTextoStroke();
     glutSwapBuffers();
 }
 
@@ -437,7 +443,6 @@ void Desenha(void)
 void TeclasEspeciais(int key, int x, int y)
 {
    int i;
-   
     if(acabou == 1){
         if(key != GLUT_KEY_HOME){
             return;
@@ -493,6 +498,9 @@ void TeclasEspeciais(int key, int x, int y)
         }
    }
    
+   if( key == 116)
+       system("killall mpg123");
+   
    
     glutPostRedisplay();
   
@@ -539,13 +547,17 @@ void AlteraTamanhoJanela(GLsizei w, GLsizei h)
 
 void Teclado (unsigned char key, int x, int y)
 {
-   if (key == 27)
+  printf("\n w = %d",key);
+   if (key == 27){
+    system("killall mpg123");
    exit(0);
+   }
 }
 
 // Programa Principal
 int main(int argc, char** argv)
 {
+   system("mpg123 mario.mp3 &");
    glutInit(&argc,argv);
    glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA);
    glutInitWindowPosition(5,5); // Especifica a posição inicial da janela GLUT
@@ -555,7 +567,7 @@ int main(int argc, char** argv)
    glutReshapeFunc(AlteraTamanhoJanela); // Registra a função callback de redimensionamento da janela de visualização
    glutKeyboardFunc (Teclado);
    glutSpecialFunc(TeclasEspeciais);
-
+   glutFullScreen();
    // Registra a função callback que será chamada a cada intervalo de tempo
    glutTimerFunc(150, Anima, 1);
    
