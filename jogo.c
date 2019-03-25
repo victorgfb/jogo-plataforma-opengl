@@ -9,11 +9,14 @@
 //*****************************************************
 
 /* teste-cronometro */
-// #include "GLFW/glfw3.h"
+#include <time.h>
+time_t start, end;
 int endMinutes = 0;
-int endSeconds = 40;
-int minutes = 0;
-int seconds = 0;
+int endSecondsPattern = 10;
+int endSeconds = 10;
+// int minutes = 0;
+// int seconds = 0;
+// int milliSecondsSinceStart;
 /* fim-teste-cronometro */
 
 #define nCores 3
@@ -119,39 +122,50 @@ void loserWindow()
 
 void time()
 {
-  int milliSecondsSinceStart, diff;
+  // int milliSecondsSinceStart, diff;
   char timeString[6];
+  int diffAux;
 
-  milliSecondsSinceStart = glutGet(GLUT_ELAPSED_TIME);
-  seconds = milliSecondsSinceStart / 1000;
-  diff = endSeconds - seconds;
-  minutes = seconds / 60;
-  seconds %= 60;
-  milliSecondsSinceStart %= 1000;
+  // milliSecondsSinceStart = glutGet(GLUT_ELAPSED_TIME);
+  // printf("milisegundos = %d\n", milliSecondsSinceStart);
+  // seconds = milliSecondsSinceStart / 1000;
+  // diff = endSeconds - seconds;
+  // minutes = seconds / 60;
+  // seconds %= 60;
+  // milliSecondsSinceStart %= 1000;
 
-  printf("%d:%d:%d\n", (diff / 60), (diff % 60), milliSecondsSinceStart);
+  // printf("%d:%d:%d\n", (diff / 60), (diff % 60), milliSecondsSinceStart);
+  time(&end);
+  diffAux = (int) difftime(end, start);
 
-  sprintf(timeString, "%d:%d", (diff / 60), (diff % 60), milliSecondsSinceStart);
+  diffAux = (endMinutes * 60 + endSeconds) - diffAux;
+
+  sprintf(timeString, "%0d:%c%d", (diffAux / 60), ((diffAux % 60) < 10) ? '0' : 255, (diffAux % 60));
 
   glBegin(GL_LINE_LOOP);
   glColor3f(1, 1, 1);
-  glVertex2f(173, 116);
+  glVertex2f(162, 116);
   glVertex2f(183, 116);
   glVertex2f(183, 121);
-  glVertex2f(173, 121);
+  glVertex2f(162, 121);
   glEnd();
 
+  glRasterPos2f(163, 117);
+  drawText(GLUT_BITMAP_TIMES_ROMAN_24, "Tempo:");
+
   glColor3f(1, 1, 1);
-  if (!(diff / 60)){
-    if(!(diff % 60))
+  if (!(diffAux / 60))
+  {
+    if (!(diffAux % 60))
       glutDisplayFunc(loserWindow);
-    if((diff % 60) <= 30){
+    if ((diffAux % 60) <= 30)
+    {
       glBegin(GL_LINE_LOOP);
       glColor3f(1, 0, 0);
-      glVertex2f(173, 116);
+      glVertex2f(162, 116);
       glVertex2f(183, 116);
       glVertex2f(183, 121);
-      glVertex2f(173, 121);
+      glVertex2f(162, 121);
       glEnd();
       glColor3f(1, 0, 0);
     }
@@ -159,8 +173,6 @@ void time()
 
   glRasterPos2f(175, 117);
   drawText(GLUT_BITMAP_TIMES_ROMAN_24, timeString);
-  // drawText(GLUT_BITMAP_9_BY_15, "OI");
-
 }
 
 void DesenhaTextoStroke()
@@ -728,7 +740,7 @@ void Desenha(void)
       percentual[x] = 0;
     }
 
-    printf("\n percentual = %f", percentual[x]);
+    // printf("\n percentual = %f", percentual[x]);
   }
 
   glPushMatrix();
@@ -926,15 +938,39 @@ void Teclado(unsigned char key, int x, int y)
   }
 }
 
+void mouseKeys(int btn, int state, int x, int y)
+{
+  printf("%d, %d\n", x, y);
+  if (btn == GLUT_LEFT_BUTTON)
+  {
+    if ((x >= 594 && x <= 739) && (y >= 543 && y <= 579))
+    {
+      Tx = 0;
+      Ty = 0;
+      animaX = 0;
+      time(&start);
+      // minutes = 0;
+      // seconds = 0;
+      // endSeconds = endSecondsPattern;
+      // milliSecondsSinceStart = glutGet(GLUT_ELAPSED_TIME);
+      // printf("milisegundos = %d\n", milliSecondsSinceStart);
+      // endSeconds = (endSeconds + endMinutes * 60) - seconds;
+      glutDisplayFunc(Desenha);
+      return;
+    }
+  }
+}
+
 // Programa Principal
 int main(int argc, char **argv)
 {
 
-  int milliSecondsSinceStart = glutGet(GLUT_ELAPSED_TIME);
+  // milliSecondsSinceStart = glutGet(GLUT_ELAPSED_TIME);
+  // printf("milisegundos = %d\n", milliSecondsSinceStart);
 
-  endSeconds = (endSeconds + endMinutes * 60) - seconds;
-
-  system("mpg123 Girls.mp3 &");
+  // endSeconds = (endSeconds + endMinutes * 60) - seconds;
+  time(&start);
+  // system("mpg123 Girls.mp3 &");
   glutInit(&argc, argv);
   glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA);
   glutInitWindowPosition(5, 5); // Especifica a posição inicial da janela GLUT
@@ -944,6 +980,7 @@ int main(int argc, char **argv)
   glutReshapeFunc(AlteraTamanhoJanela); // Registra a função callback de redimensionamento da janela de visualização
   glutKeyboardFunc(Teclado);
   glutSpecialFunc(TeclasEspeciais);
+  glutMouseFunc(mouseKeys);
   glutFullScreen();
   // Registra a função callback que será chamada a cada intervalo de tempo
   glutTimerFunc(150, Anima, 1);
