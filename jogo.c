@@ -11,7 +11,7 @@
 /* teste-cronometro */
 // #include "GLFW/glfw3.h"
 int endMinutes = 0;
-int endSeconds = 59;
+int endSeconds = 40;
 int minutes = 0;
 int seconds = 0;
 /* fim-teste-cronometro */
@@ -133,16 +133,34 @@ void time()
 
   sprintf(timeString, "%d:%d", (diff / 60), (diff % 60), milliSecondsSinceStart);
 
+  glBegin(GL_LINE_LOOP);
   glColor3f(1, 1, 1);
-  glRasterPos2f(180, 116);
+  glVertex2f(173, 116);
+  glVertex2f(183, 116);
+  glVertex2f(183, 121);
+  glVertex2f(173, 121);
+  glEnd();
+
+  glColor3f(1, 1, 1);
+  if (!(diff / 60)){
+    if(!(diff % 60))
+      glutDisplayFunc(loserWindow);
+    if((diff % 60) <= 30){
+      glBegin(GL_LINE_LOOP);
+      glColor3f(1, 0, 0);
+      glVertex2f(173, 116);
+      glVertex2f(183, 116);
+      glVertex2f(183, 121);
+      glVertex2f(173, 121);
+      glEnd();
+      glColor3f(1, 0, 0);
+    }
+  }
+
+  glRasterPos2f(175, 117);
   drawText(GLUT_BITMAP_TIMES_ROMAN_24, timeString);
   // drawText(GLUT_BITMAP_9_BY_15, "OI");
 
-  if (!(diff / 60) && !(diff % 60))
-  {
-    // exit(0);
-    glutDisplayFunc(loserWindow);
-  }
 }
 
 void DesenhaTextoStroke()
