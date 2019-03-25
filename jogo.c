@@ -9,11 +9,14 @@
 //*****************************************************
 
 /* teste-cronometro */
-// #include "GLFW/glfw3.h"
+#include <time.h>
+time_t start, end;
 int endMinutes = 0;
-int endSeconds = 59;
-int minutes = 0;
-int seconds = 0;
+int endSecondsPattern = 10;
+int endSeconds = 10;
+// int minutes = 0;
+// int seconds = 0;
+// int milliSecondsSinceStart;
 /* fim-teste-cronometro */
 int audio = 1;
 #define nCores 3
@@ -28,7 +31,7 @@ int audio = 1;
 #define nblocos 53
 static GLuint texturasObjeto[8];
 static GLuint texture = 0;
-int auxiliar[nblocos] = {0, 0};
+int auxiliar[nblocos];
 int aux1[nblocos];
 int diff[nblocos];
 float percentual[nblocos];
@@ -37,7 +40,7 @@ int ladoPrecionado = 0;
 int esquerdaPrecionado = 0;
 int backupTy = 0;
 int auxTx = 0;
-int colidiu[nblocos] = {0, 0};
+int colidiu[nblocos];
 int countDir = 0;
 // Variáveis que guardam a translação que será aplicada
 // sobre a casinha
@@ -148,30 +151,57 @@ void fallWindow()
 
 void time()
 {
-  int milliSecondsSinceStart, diff;
+  // int milliSecondsSinceStart, diff;
   char timeString[6];
+  int diffAux;
 
-  milliSecondsSinceStart = glutGet(GLUT_ELAPSED_TIME);
-  seconds = milliSecondsSinceStart / 1000;
-  diff = endSeconds - seconds;
-  minutes = seconds / 60;
-  seconds %= 60;
-  milliSecondsSinceStart %= 1000;
+  // milliSecondsSinceStart = glutGet(GLUT_ELAPSED_TIME);
+  // printf("milisegundos = %d\n", milliSecondsSinceStart);
+  // seconds = milliSecondsSinceStart / 1000;
+  // diff = endSeconds - seconds;
+  // minutes = seconds / 60;
+  // seconds %= 60;
+  // milliSecondsSinceStart %= 1000;
 
-  printf("%d:%d:%d\n", (diff / 60), (diff % 60), milliSecondsSinceStart);
+  // printf("%d:%d:%d\n", (diff / 60), (diff % 60), milliSecondsSinceStart);
+  time(&end);
+  diffAux = (int) difftime(end, start);
 
-  sprintf(timeString, "%d:%d", (diff / 60), (diff % 60), milliSecondsSinceStart);
+  diffAux = (endMinutes * 60 + endSeconds) - diffAux;
+
+  sprintf(timeString, "%0d:%c%d", (diffAux / 60), ((diffAux % 60) < 10) ? '0' : 255, (diffAux % 60));
+
+  glBegin(GL_LINE_LOOP);
+  glColor3f(1, 1, 1);
+  glVertex2f(162, 116);
+  glVertex2f(183, 116);
+  glVertex2f(183, 121);
+  glVertex2f(162, 121);
+  glEnd();
+
+  glRasterPos2f(163, 117);
+  drawText(GLUT_BITMAP_TIMES_ROMAN_24, "Tempo:");
 
   glColor3f(1, 1, 1);
-  glRasterPos2f(180, 116);
-  drawText(GLUT_BITMAP_TIMES_ROMAN_24, timeString);
-  // drawText(GLUT_BITMAP_9_BY_15, "OI");
-
-  if (!(diff / 60) && !(diff % 60))
+  if (!(diffAux / 60))
   {
-    // exit(0);
-    glutDisplayFunc(loserWindow);
+    if (!(diffAux % 60))
+      glutDisplayFunc(loserWindow);
+    if ((diffAux % 60) <= 30)
+    {
+      glBegin(GL_LINE_LOOP);
+      glColor3f(1, 0, 0);
+      glVertex2f(162, 116);
+      glVertex2f(183, 116);
+      glVertex2f(183, 121);
+      glVertex2f(162, 121);
+      glEnd();
+      glColor3f(1, 0, 0);
+    }
   }
+
+  glRasterPos2f(175, 117);
+  drawText(GLUT_BITMAP_TIMES_ROMAN_24, timeString);
 }
 
 void DesenhaTextoStroke()
@@ -550,10 +580,10 @@ void Inicializa(void)
   // Define a cor de fundo da janela de visualização como branco
 
   glClearColor(1.0f, 1.0f, 1.0f, 0.0f);
-  x1 = 0;
-  x2 = 9;
-  x3 = 9;
-  x4 = 0;
+  x1 = 10;
+  x2 = 19;
+  x3 = 19;
+  x4 = 10;
   y4 = 50;
   y2 = 50;
   y3 = 65;
@@ -912,7 +942,7 @@ void Desenha(void)
   paredes = coresParedes[0];
   fundo = coresFundo[0];
   objeto = coresObjeto[0];
-
+  printf("\n tx = %d", Tx);
   //Tx += xStep;
   // Muda para o sistema de coordenadas do modelo
   glMatrixMode(GL_MODELVIEW);
@@ -982,7 +1012,7 @@ void Desenha(void)
       percentual[x] = 0;
     }
 
-    //printf("\n percentual = %f", percentual[x]);
+    // printf("\n percentual = %f", percentual[x]);
   }
 
   glPushMatrix();
@@ -1032,7 +1062,6 @@ void Desenha(void)
     if (!subindo && !flag)
     {
       Ty -= 15;
-      printf("\nTy = %d\n", Ty);
       count += xStep;
     }
     else
@@ -1210,15 +1239,49 @@ void Teclado(unsigned char key, int x, int y)
   }
 }
 
+void mouseKeys(int btn, int state, int x, int y)
+{
+  printf("%d, %d\n", x, y);
+  if (btn == GLUT_LEFT_BUTTON)
+  {
+    if ((x >= 594 && x <= 739) && (y >= 543 && y <= 579))
+    {
+      Tx = 0;
+      Ty = 0;
+      animaX = 0;
+      countDir = 0;
+      Tx = 0;
+      Ty = 0;
+      pulando = 0;
+      animaX = 0;
+      acabou = 0;
+      count = 0;
+      subindo = 0;
+      ladoPrecionado = 0;
+      esquerdaPrecionado = 0;
+      i = 0;
+      time(&start);
+      // minutes = 0;
+      // seconds = 0;
+      // endSeconds = endSecondsPattern;
+      // milliSecondsSinceStart = glutGet(GLUT_ELAPSED_TIME);
+      // printf("milisegundos = %d\n", milliSecondsSinceStart);
+      // endSeconds = (endSeconds + endMinutes * 60) - seconds;
+      glutDisplayFunc(Desenha);
+      return;
+    }
+  }
+}
 
 // Programa Principal
 int main(int argc, char **argv)
 {
 
-  int milliSecondsSinceStart = glutGet(GLUT_ELAPSED_TIME);
+  // milliSecondsSinceStart = glutGet(GLUT_ELAPSED_TIME);
+  // printf("milisegundos = %d\n", milliSecondsSinceStart);
 
-  endSeconds = (endSeconds + endMinutes * 60) - seconds;
-  
+  // endSeconds = (endSeconds + endMinutes * 60) - seconds;
+  time(&start);
   system("mpg123 Girls.mp3 &");
   glutInit(&argc, argv);
   glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA);
@@ -1230,6 +1293,7 @@ int main(int argc, char **argv)
   glutReshapeFunc(AlteraTamanhoJanela); // Registra a função callback de redimensionamento da janela de visualização
   glutKeyboardFunc(Teclado);
   glutSpecialFunc(TeclasEspeciais);
+  glutMouseFunc(mouseKeys);
   glutFullScreen();
   //Registra a função callback que será chamada a cada intervalo de tempo
   glutTimerFunc(150, Anima, 1);
