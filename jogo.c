@@ -15,7 +15,7 @@ int endSeconds = 59;
 int minutes = 0;
 int seconds = 0;
 /* fim-teste-cronometro */
-
+int audio = 1;
 #define nCores 3
 #include <stdlib.h>
 #include <stdio.h>
@@ -25,7 +25,7 @@ int seconds = 0;
 #define yStep 1  //incremento no eixo y
 #define maxY 125 //valor máximo do eixo Y
 #define maxX 105 //valor máximo do eixo X
-#define nblocos 7
+#define nblocos 53
 static GLuint texturasObjeto[8];
 static GLuint texture = 0;
 int auxiliar[nblocos] = {0, 0};
@@ -84,6 +84,9 @@ struct objeto blocos[nblocos], tri, blocosAux[nblocos];
 int i = 0;
 int timer = 0;
 
+void CriarMenu();
+void Janela(int opcao);
+
 void drawText(void *font, char *string)
 {
   // Exibe caractere a caractere
@@ -92,6 +95,32 @@ void drawText(void *font, char *string)
 }
 
 void loserWindow()
+{
+    glutPostRedisplay();
+    glutSwapBuffers();
+
+    glClearColor(0.0, 0.0, 0.0, 1.0);
+    glClear(GL_COLOR_BUFFER_BIT);
+
+    glColor3f(1, 0, 0);
+    glRasterPos2f(70, 55);
+
+    drawText(GLUT_BITMAP_TIMES_ROMAN_24, "Tempo esgotado. Que pena...");
+
+    glColor3f(0.0, 1.0, 0.0);
+    glBegin(GL_QUADS);
+    glVertex2f(80.0, 30.0);
+    glVertex2f(100.0, 30.0);
+    glVertex2f(100.0, 36.0);
+    glVertex2f(80.0, 36.0);
+    glEnd();
+
+    glColor3f(1, 1, 1);
+    glRasterPos2f(81, 32);
+    drawText(GLUT_BITMAP_9_BY_15, "Tente novamente");
+}
+
+void fallWindow()
 {
   glutPostRedisplay();
   glutSwapBuffers();
@@ -102,7 +131,7 @@ void loserWindow()
   glColor3f(1, 0, 0);
   glRasterPos2f(70, 55);
 
-  drawText(GLUT_BITMAP_TIMES_ROMAN_24, "Tempo esgotado. Que pena...");
+  drawText(GLUT_BITMAP_TIMES_ROMAN_24, "Voce caiu da plataforma.");
 
   glColor3f(0.0, 1.0, 0.0);
   glBegin(GL_QUADS);
@@ -209,10 +238,11 @@ int detectaColisao(struct objeto linha)
   {
     colidiu = 0;
   }
+  
   if (tri.y1 >= linha.y1 && tri.y2 < linha.y2 && tri.x2 >= linha.x1 && tri.x1 <= linha.x2)
   {
     subindo = 0;
-    //  printf("\nentrou aq");
+      printf("\nentrou aq");
   }
   return colidiu;
 }
@@ -277,18 +307,257 @@ void Inicializa(void)
   blocos[6].x2 = 130;
   blocos[6].y1 = 45;
   blocos[6].y2 = 50; //valores chatos
+  
+  
+  blocos[7].x1 = 135;
+   blocos[7].x2 = 165;
+   blocos[7].y1 = 30;
+   blocos[7].y2 = 35; //valores chatos
+
+   blocos[8].x1 = 130;
+   blocos[8].x2 = 155;
+   blocos[8].y1 = 75;
+   blocos[8].y2 = 80;
+   
+   blocos[9].x1 = 175;
+   blocos[9].x2 = 195;
+   blocos[9].y1 = 45;
+   blocos[9].y2 = 50;
+
+   blocos[10].x1 = 175;
+   blocos[10].x2 = 190;
+   blocos[10].y1 = 90;
+   blocos[10].y2 = 95; //valores chatos
+
+   blocos[11].x1 = 220;
+   blocos[11].x2 = 235;
+   blocos[11].y1 = 90;
+   blocos[11].y2 = 95;
+   
+   blocos[12].x1 = 250;
+   blocos[12].x2 = 270;
+   blocos[12].y1 = 60;
+   blocos[12].y2 = 65;
+   
+   blocos[13].x1 = 280;
+   blocos[13].x2 = 300;
+   blocos[13].y1 = 30;
+   blocos[13].y2 = 35; 
+
+   blocos[14].x1 = 200;
+   blocos[14].x2 = 225;
+   blocos[14].y1 = 60;
+   blocos[14].y2 = 65;
+   
+//////////////////////////////////////////////////
+
+  blocos[15].x1 = 270;
+  blocos[15].x2 = 290;
+  blocos[15].y1 = 75;
+  blocos[15].y2 = 80;
+  
+  blocos[16].x1 = 310;
+  blocos[16].x2 = 335;
+  blocos[16].y1 = 45;
+  blocos[16].y2 = 50;
+  
+  blocos[17].x1 = 335;
+  blocos[17].x2 = 355;
+  blocos[17].y1 = 60;
+  blocos[17].y2 = 65;
+  
+  blocos[18].x1 = 370;
+  blocos[18].x2 = 390;
+  blocos[18].y1 = 50;
+  blocos[18].y2 = 45;
+  
+  blocos[19].x1 = 405;
+  blocos[19].x2 = 425;
+  blocos[19].y1 = 60;
+  blocos[19].y2 = 65;
+  
+  blocos[20].x1 = 440;
+  blocos[20].x2 = 460;
+  blocos[20].y1 = 45;
+  blocos[20].y2 = 50;
+  
+  blocos[21].x1 = 470;
+  blocos[21].x2 = 490;
+  blocos[21].y1 = 60;
+  blocos[21].y2 = 65;
+  
+  blocos[22].x1 = 500;
+  blocos[22].x2 = 520;
+  blocos[22].y1 = 75;
+  blocos[22].y2 = 80;
+  
+  blocos[23].x1 = 530;
+  blocos[23].x2 = 550;
+  blocos[23].y1 = 90;
+  blocos[23].y2 = 95;
+  
+  blocos[24].x1 = 560;
+  blocos[24].x2 = 580;
+  blocos[24].y1 = 20;
+  blocos[24].y2 = 15;
+  
+  blocos[25].x1 = 590;
+  blocos[25].x2 = 620;
+  blocos[25].y1 = 30;
+  blocos[25].y2 = 35;
+  
+  blocos[26].x1 = 630;
+  blocos[26].x2 = 650;
+  blocos[26].y1 = 45;
+  blocos[26].y2 = 50;
+  
+  blocos[27].x1 = 665;
+  blocos[27].x2 = 680;
+  blocos[27].y1 = 30;
+  blocos[27].y2 = 35;
+  
+  blocos[28].x1 = 675;
+  blocos[28].x2 = 700;
+  blocos[28].y1 = 60;
+  blocos[28].y2 = 65;
+  
+  blocos[29].x1 = 695;
+  blocos[29].x2 = 720;
+  blocos[29].y1 = 15;
+  blocos[29].y2 = 20;
+  
+  blocos[30].x1 = 725;
+  blocos[30].x2 = 740;
+  blocos[30].y1 = 45;
+  blocos[30].y2 = 50;
+  
+  blocos[31].x1 = 750;
+  blocos[31].x2 = 760;
+  blocos[31].y1 = 60;
+  blocos[31].y2 = 65;
+  
+  blocos[32].x1 = 770;
+  blocos[32].x2 = 780;
+  blocos[32].y1 = 60;
+  blocos[32].y2 = 65;
+  
+  blocos[33].x1 = 795;
+  blocos[33].x2 = 810;
+  blocos[33].y1 = 45;
+  blocos[33].y2 = 50;
+  
+  blocos[34].x1 = 820;
+  blocos[34].x2 = 830;
+  blocos[34].y1 = 60;
+  blocos[34].y2 = 65;
+  
+  blocos[35].x1 = 835;
+  blocos[35].x2 = 850;
+  blocos[35].y1 = 75;
+  blocos[35].y2 = 80;
+  
+  blocos[36].x1 = 835;
+  blocos[36].x2 = 860;
+  blocos[36].y1 = 15;
+  blocos[36].y2 = 20;
+  
+  blocos[37].x1 = 870;
+  blocos[37].x2 = 890;
+  blocos[37].y1 = 30;
+  blocos[37].y2 = 35;
+  
+  blocos[38].x1 = 900;
+  blocos[38].x2 = 910;
+  blocos[38].y1 = 45;
+  blocos[38].y2 = 50;
+  
+  blocos[39].x1 = 930;
+  blocos[39].x2 = 940;
+  blocos[39].y1 = 45;
+  blocos[39].y2 = 50;
+  
+  blocos[40].x1 = 960;
+  blocos[40].x2 = 970;
+  blocos[40].y1 = 45;
+  blocos[40].y2 = 50;
+  
+  blocos[41].x1 = 980;
+  blocos[41].x2 = 990;
+  blocos[41].y1 = 30;
+  blocos[41].y2 = 35;
+  
+  blocos[42].x1 = 1000;
+  blocos[42].x2 = 1010;
+  blocos[42].y1 = 45;
+  blocos[42].y2 = 50;
+  
+  blocos[43].x1 = 1015;
+  blocos[43].x2 = 1020;
+  blocos[43].y1 = 60;
+  blocos[43].y2 = 65;
+  
+  blocos[44].x1 = 1030;
+  blocos[44].x2 = 1040;
+  blocos[44].y1 = 60;
+  blocos[44].y2 = 65;
+  
+  blocos[45].x1 = 1060;
+  blocos[45].x2 = 1070;
+  blocos[45].y1 = 60;
+  blocos[45].y2 = 65;
+  
+  blocos[46].x1 = 1090;
+  blocos[46].x2 = 1100;
+  blocos[46].y1 = 60;
+  blocos[46].y2 = 65;
+  
+  blocos[47].x1 = 1110;
+  blocos[47].x2 = 1130;
+  blocos[47].y1 = 30;
+  blocos[47].y2 = 35;
+  
+  blocos[48].x1 = 1145;
+  blocos[48].x2 = 1160;
+  blocos[48].y1 = 45;
+  blocos[48].y2 = 50;
+  
+  blocos[49].x1 = 1160;
+  blocos[49].x2 = 1185;
+  blocos[49].y1 = 30;
+  blocos[49].y2 = 35;
+  
+  blocos[50].x1 = 1200;
+  blocos[50].x2 = 1215;
+  blocos[50].y1 = 45;
+  blocos[50].y2 = 50;
+  
+  blocos[51].x1 = 1230;
+  blocos[51].x2 = 1250;
+  blocos[51].y1 = 60;
+  blocos[51].y2 = 65;
+  
+  blocos[52].x1 = 1260;
+  blocos[52].x2 = 1270;
+  blocos[52].y1 = 75;
+  blocos[52].y2 = 80;
+  
+  blocos[53].x1 = 1255;
+  blocos[53].x2 = 1280;
+  blocos[53].y1 = 30;
+  blocos[53].y2 = 35;
+  
 
   // Define a cor de fundo da janela de visualização como branco
 
   glClearColor(1.0f, 1.0f, 1.0f, 0.0f);
   x1 = 0;
-  x2 = 14;
-  x3 = 14;
+  x2 = 9;
+  x3 = 9;
   x4 = 0;
-  y4 = 20;
-  y2 = 20;
-  y3 = 35;
-  y5 = 35;
+  y4 = 50;
+  y2 = 50;
+  y3 = 65;
+  y5 = 65;
 
   glClearColor(fundo.r, fundo.g, fundo.b, 0.0f);
 
@@ -622,6 +891,9 @@ void desenhaFundos()
 void Desenha(void)
 {
 
+  if(Ty <= -135)
+       glutDisplayFunc(fallWindow);
+
   //1 mudança
   int flag = 0;
   int x = 0;
@@ -710,7 +982,7 @@ void Desenha(void)
       percentual[x] = 0;
     }
 
-    printf("\n percentual = %f", percentual[x]);
+    //printf("\n percentual = %f", percentual[x]);
   }
 
   glPushMatrix();
@@ -757,9 +1029,10 @@ void Desenha(void)
       }
     }
 
-    if (Ty > (backupTy + 8) && !subindo && !flag)
+    if (!subindo && !flag)
     {
       Ty -= 15;
+      printf("\nTy = %d\n", Ty);
       count += xStep;
     }
     else
@@ -899,6 +1172,35 @@ void AlteraTamanhoJanela(GLsizei w, GLsizei h)
   }
 }
 
+void CriarMenu()
+{
+    int menu;
+    menu = glutCreateMenu(Janela);
+    glutAddMenuEntry("Desligar som", 0);
+    glutAddMenuEntry("Ligar som", 1);
+    
+    glutAttachMenu(GLUT_RIGHT_BUTTON);
+}
+
+void Janela(int opcao)
+{
+    switch(opcao){
+        case 0:
+           if(audio == 1)
+                system("killall mpg123"); 
+           audio = 0; 
+        break;
+        case 1:
+           if(audio == 0)
+                system("mpg123 Girls.mp3 &");
+           audio = 1;
+        break;
+   }
+    
+    glutPostRedisplay();
+}
+
+
 void Teclado(unsigned char key, int x, int y)
 {
   if (key == 27)
@@ -908,6 +1210,7 @@ void Teclado(unsigned char key, int x, int y)
   }
 }
 
+
 // Programa Principal
 int main(int argc, char **argv)
 {
@@ -915,21 +1218,22 @@ int main(int argc, char **argv)
   int milliSecondsSinceStart = glutGet(GLUT_ELAPSED_TIME);
 
   endSeconds = (endSeconds + endMinutes * 60) - seconds;
-
+  
   system("mpg123 Girls.mp3 &");
   glutInit(&argc, argv);
   glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA);
   glutInitWindowPosition(5, 5); // Especifica a posição inicial da janela GLUT
   glutInitWindowSize(400, 400); // Especifica o tamanho inicial em pixels da janela GLUT
   glutCreateWindow("mario");
+   CriarMenu();
   glutDisplayFunc(Desenha);
   glutReshapeFunc(AlteraTamanhoJanela); // Registra a função callback de redimensionamento da janela de visualização
   glutKeyboardFunc(Teclado);
   glutSpecialFunc(TeclasEspeciais);
   glutFullScreen();
-  // Registra a função callback que será chamada a cada intervalo de tempo
+  //Registra a função callback que será chamada a cada intervalo de tempo
   glutTimerFunc(150, Anima, 1);
 
   Inicializa();
-  glutMainLoop();
+   glutMainLoop();
 }
