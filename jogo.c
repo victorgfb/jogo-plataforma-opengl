@@ -10,15 +10,6 @@
 
 /* teste-cronometro */
 #include <time.h>
-time_t start, end;
-int endMinutes = 0;
-int endSecondsPattern = 10;
-int endSeconds = 10;
-// int minutes = 0;
-// int seconds = 0;
-// int milliSecondsSinceStart;
-/* fim-teste-cronometro */
-int audio = 1;
 #define nCores 3
 #include <stdlib.h>
 #include <stdio.h>
@@ -29,7 +20,19 @@ int audio = 1;
 #define maxY 125 //valor máximo do eixo Y
 #define maxX 105 //valor máximo do eixo X
 #define nblocos 53
-static GLuint texturasObjeto[8];
+#define nmacas 1
+#define nremedio 1
+
+time_t start, end;
+int endMinutes = 0;
+int endSecondsPattern = 10;
+int endSeconds = 10;
+// int minutes = 0;
+// int seconds = 0;
+// int milliSecondsSinceStart;
+/* fim-teste-cronometro */
+int audio = 1;
+static GLuint texturasObjeto[16];
 static GLuint texture = 0;
 int auxiliar[nblocos];
 int aux1[nblocos];
@@ -83,12 +86,152 @@ struct cor objeto;
 struct cor coresParedes[nCores];
 struct cor coresFundo[nCores];
 struct cor coresObjeto[nCores];
-struct objeto blocos[nblocos], tri, blocosAux[nblocos];
+struct objeto blocos[nblocos], tri, blocosAux[nblocos], maca[nmacas], remedio[nremedio];
 int i = 0;
 int timer = 0;
-
+int macaPega[nmacas], remedioPega[nremedio];
 void CriarMenu();
 void Janela(int opcao);
+
+void incrementaTempo(int inc){
+  if (endSeconds + inc >= 60) {
+      endMinutes++;
+      endSeconds = (endSeconds + inc) % 60;
+  }else{
+    endSeconds += inc; 
+  }
+}
+
+void decrementaTempo(int inc){
+  if (endSeconds - inc < 0) {
+      endMinutes--;
+      endSeconds = 60 + (endSeconds - inc);
+  }else{
+    endSeconds -= inc; 
+  }
+}
+
+void detectaColisaoMaca(){
+  int k = 0;
+
+   for(k = 0; k < nmacas; k++)
+   {
+     if(macaPega[k] == 1)
+      continue;
+
+      if(((maca[k].x1 - animaX) == tri.x2)  && (tri.y2 <= maca[k].y1)){
+        macaPega[k] = 1;
+        incrementaTempo(30);
+        continue;
+      }
+
+      if(((maca[k].x2 - animaX) == tri.x1)  && (tri.y2 <= remedio[k].y1)){
+        macaPega[k] = 1;
+        incrementaTempo(30);
+        continue;
+      }
+
+       if(((maca[k].x2 - animaX) >= tri.x2) && ((maca[k].x1 - animaX) <= tri.x2)){
+         if((tri.y2 <= maca[k].y1)){
+            macaPega[k] = 1;
+            incrementaTempo(30);
+         }
+      }
+
+   }
+
+}
+
+void desenhaMacas(){
+  int j = 0;
+  
+  glBindTexture(GL_TEXTURE_2D, texturasObjeto[12]);
+
+  for( j = 0; j < nmacas; j++)
+  {
+      if(macaPega[j] == 1)
+        continue;
+
+      //glColor3f(0, 1, 0);
+      glEnable(GL_BLEND);
+      glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+      glEnable(GL_TEXTURE_2D);
+      glBegin(GL_QUADS);
+      glTexCoord2f(0.0f, 0.0f);
+      glVertex2f(maca[j].x1 - animaX, maca[j].y1);
+      glTexCoord2f(1.0f, 0.0f);
+      glVertex2f(maca[j].x2 - animaX, maca[j].y1);
+      glTexCoord2f(1.0f, 1.0f);
+      glVertex2f(maca[j].x2 - animaX, maca[j].y2);
+      glTexCoord2f(0.0f, 1.0f);
+      glVertex2f(maca[j].x1 - animaX, maca[j].y2);
+      glEnd();
+      glDisable(GL_TEXTURE_2D);
+  }
+  
+}
+
+void desenhaRemedio(){
+  int j = 0;
+  
+  glBindTexture(GL_TEXTURE_2D, texturasObjeto[13]);
+
+  for( j = 0; j < nremedio; j++)
+  {
+      if(remedioPega[j] == 1)
+        continue;
+
+      //glColor3f(0, 1, 0);
+      glEnable(GL_BLEND);
+      glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+      glEnable(GL_TEXTURE_2D);
+      glBegin(GL_QUADS);
+      glTexCoord2f(0.0f, 0.0f);
+      glVertex2f(remedio[j].x1 - animaX, remedio[j].y1);
+      glTexCoord2f(1.0f, 0.0f);
+      glVertex2f(remedio[j].x2 - animaX, remedio[j].y1);
+      glTexCoord2f(1.0f, 1.0f);
+      glVertex2f(remedio[j].x2 - animaX, remedio[j].y2);
+      glTexCoord2f(0.0f, 1.0f);
+      glVertex2f(remedio[j].x1 - animaX, remedio[j].y2);
+      glEnd();
+      glDisable(GL_TEXTURE_2D);
+  }
+  
+}
+
+void detectaColisaoRemedio(){
+  int k = 0;
+
+   for(k = 0; k < nremedio; k++)
+   {
+     if(remedioPega[k] == 1)
+      continue;
+      
+      if(((remedio[k].x1 - animaX) == tri.x2) && (tri.y2 <= remedio[k].y1)){
+        remedioPega[k] = 1;
+        decrementaTempo(30);
+        continue;
+      }
+
+      if(((remedio[k].x2 - animaX) == tri.x1) && (tri.y2 <= remedio[k].y1)){
+        remedioPega[k] = 1;
+        decrementaTempo(30);
+        continue;
+      }
+
+      if(((remedio[k].x2 - animaX) >= tri.x2) && ((remedio[k].x1 - animaX) <= tri.x2)){
+        if((tri.y2 <= remedio[k].y1)){
+          remedioPega[k] = 1;
+          decrementaTempo(30);
+          continue;
+        }
+      }
+
+   
+   }
+
+}
 
 void drawText(void *font, char *string)
 {
@@ -281,7 +424,7 @@ int detectaColisao(struct objeto linha)
 
 void carregarImagens(void)
 {
-  glGenTextures(11, texturasObjeto);
+  glGenTextures(15, texturasObjeto);
   carregarTextura(texturasObjeto[0], "imagem/sprite_05.png");
   carregarTextura(texturasObjeto[1], "imagem/sprite_06.png");
   carregarTextura(texturasObjeto[2], "imagem/sprite_07.png");
@@ -293,6 +436,10 @@ void carregarImagens(void)
   carregarTextura(texturasObjeto[9], "imagem/sprite_12.png");
   carregarTextura(texturasObjeto[10], "imagem/sprite_13.png");
   carregarTextura(texturasObjeto[11], "imagem/sprite_14.png");
+  carregarTextura(texturasObjeto[12], "imagem/sprite_15.png");
+  carregarTextura(texturasObjeto[13], "imagem/sprite_16.png");
+  carregarTextura(texturasObjeto[14], "imagem/tutorial.png");
+  carregarTextura(texturasObjeto[15], "imagem/tutorial2.png");
   carregarTextura(texturasObjeto[7], "imagem/sprite_00.png");
 }
 
@@ -304,7 +451,17 @@ void Inicializa(void)
   paredes = coresParedes[i];
   fundo = coresFundo[i];
   objeto = coresObjeto[i];
+  
+  maca[0].x1 = 60;
+  maca[0].x2 = 70;
+  maca[0].y1 = 70;
+  maca[0].y2 = 80;
 
+  remedio[0].x1 = 70;
+  remedio[0].x2 = 80;
+  remedio[0].y1 = 40;
+  remedio[0].y2 = 50;
+  
   blocos[0].x1 = 0;
   blocos[0].x2 = 30;
   blocos[0].y1 = 15;
@@ -639,6 +796,9 @@ void desenhaTriangulo()
   {
     colidiu[i] = detectaColisao(blocosAux[i]);
   }
+
+  detectaColisaoMaca();
+  detectaColisaoRemedio();
 }
 
 void desenhaFundos()
@@ -1088,6 +1248,8 @@ void Desenha(void)
 
   //desenhaFundos();
   desenhaTriangulo();
+  desenhaMacas();
+  desenhaRemedio();
   // DesenhaTextoStroke();
   glutSwapBuffers();
 }
