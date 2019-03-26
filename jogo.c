@@ -20,8 +20,8 @@
 #define maxY 125 //valor máximo do eixo Y
 #define maxX 105 //valor máximo do eixo X
 #define nblocos 53
-#define nmacas 1
-#define nremedio 1
+#define nmacas 5
+#define nremedio 5
 
 time_t start, end;
 int endMinutes = 0;
@@ -281,10 +281,17 @@ void loserWindow()
     glClear(GL_COLOR_BUFFER_BIT);
 
     glColor3f(1, 0, 0);
-    glRasterPos2f(72, 70);
+    glRasterPos2f(72, 80);
 
-    drawText(GLUT_BITMAP_TIMES_ROMAN_24, "Tempo esgotado. Que pena...");
+    drawText(GLUT_BITMAP_TIMES_ROMAN_24, "Tempo esgotado. Que pena... ");
 
+        glRasterPos2f(50, 73);
+
+     drawText(GLUT_BITMAP_TIMES_ROMAN_24, " Você jamais vai morrer de fome.  Se tivesse ficado na comunidade, não estaria. [...]");
+
+    glRasterPos2f(20, 65);
+     
+      drawText(GLUT_BITMAP_TIMES_ROMAN_24, " Se tivesse ficado lá, teria morrido de outras fomes. Teria vivido uma vida com fome de sentimentos, de cores, de amor.");
     glRasterPos2f(74, 60);
 
     drawText(GLUT_BITMAP_TIMES_ROMAN_24, stringPoints);
@@ -499,10 +506,53 @@ void Inicializa(void)
   maca[0].y1 = 70;
   maca[0].y2 = 80;
 
+  maca[1].x1 = 220;
+  maca[1].x2 = 230;
+  maca[1].y1 = 95;
+  maca[1].y2 = 105;
+
+  maca[2].x1 = 480;
+  maca[2].x2 = 490;
+  maca[2].y1 = 80;
+  maca[2].y2 = 90;  
+  
+  maca[3].x1 = 835;
+  maca[3].x2 = 845;
+  maca[3].y1 = 80;
+  maca[3].y2 = 90;  
+  
+  maca[4].x1 = 1010;
+  maca[4].x2 = 1020;
+  maca[4].y1 = 65;
+  maca[4].y2 = 75;  
+  
   remedio[0].x1 = 70;
   remedio[0].x2 = 80;
   remedio[0].y1 = 40;
   remedio[0].y2 = 50;
+  
+  
+  remedio[1].x1 = 290;
+  remedio[1].x2 = 300;
+  remedio[1].y1 = 35;
+  remedio[1].y2 = 45;
+  
+  remedio[2].x1 = 560;
+  remedio[2].x2 = 570;
+  remedio[2].y1 = 20;
+  remedio[2].y2 = 30;
+  
+  
+  remedio[3].x1 = 980;
+  remedio[3].x2 = 990;
+  remedio[3].y1 = 35;
+  remedio[3].y2 = 45;
+  
+  
+  remedio[4].x1 = 710;
+  remedio[4].x2 = 720;
+  remedio[4].y1 = 20;
+  remedio[4].y2 = 30;
   
   blocos[0].x1 = 0;
   blocos[0].x2 = 30;
