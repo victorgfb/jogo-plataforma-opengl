@@ -14,10 +14,12 @@ time_t start, end;
 int endMinutes = 0;
 int endSecondsPattern = 10;
 int endSeconds = 10;
-// int minutes = 0;
-// int seconds = 0;
-// int milliSecondsSinceStart;
 /* fim-teste-cronometro */
+
+/* ranking */
+int maxPoints = 200;
+/* fim-ranking */
+
 int audio = 1;
 #define nCores 3
 #include <stdlib.h>
@@ -97,9 +99,33 @@ void drawText(void *font, char *string)
     glutBitmapCharacter(font, *string++);
 }
 
+int countPlataformsPainted(){
+  int count = 0;
+  int i;
+
+  for(i = 0; i < nblocos; i++)
+    if(percentual[i] >= 100)
+      count++;
+
+  return count;
+}
+
+float getPoints(int platformsPainted){
+  return (maxPoints * platformsPainted) / nblocos;
+}
+
+int round(double number)
+{
+    return (number >= 0) ? (int)(number + 0.5) : (int)(number - 0.5);
+}
+
 void loserWindow()
 {
+    char stringPoints[50];
     acabou = 1;
+    
+    sprintf(stringPoints, "%s %d %s", "Voce conseguiu", round(getPoints(countPlataformsPainted())), "pontos.");
+
     glutPostRedisplay();
     glutSwapBuffers();
 
@@ -107,9 +133,13 @@ void loserWindow()
     glClear(GL_COLOR_BUFFER_BIT);
 
     glColor3f(1, 0, 0);
-    glRasterPos2f(70, 55);
+    glRasterPos2f(72, 70);
 
     drawText(GLUT_BITMAP_TIMES_ROMAN_24, "Tempo esgotado. Que pena...");
+
+    glRasterPos2f(74, 60);
+
+    drawText(GLUT_BITMAP_TIMES_ROMAN_24, stringPoints);
 
     glColor3f(0.0, 1.0, 0.0);
     glBegin(GL_QUADS);
@@ -126,7 +156,11 @@ void loserWindow()
 
 void fallWindow()
 {
+  char stringPoints[50];
   acabou =1; 
+
+  sprintf(stringPoints, "%s %d %s", "Voce conseguiu", round(getPoints(countPlataformsPainted())), "pontos.");
+
   glutPostRedisplay();
   glutSwapBuffers();
 
@@ -134,9 +168,13 @@ void fallWindow()
   glClear(GL_COLOR_BUFFER_BIT);
 
   glColor3f(1, 0, 0);
-  glRasterPos2f(70, 55);
+  glRasterPos2f(75, 70);
 
   drawText(GLUT_BITMAP_TIMES_ROMAN_24, "Voce caiu da plataforma.");
+
+  glRasterPos2f(74, 60);
+
+  drawText(GLUT_BITMAP_TIMES_ROMAN_24, stringPoints);
 
   glColor3f(0.0, 1.0, 0.0);
   glBegin(GL_QUADS);
@@ -153,19 +191,8 @@ void fallWindow()
 
 void time()
 {
-  // int milliSecondsSinceStart, diff;
   char timeString[6];
   int diffAux;
-
-  // milliSecondsSinceStart = glutGet(GLUT_ELAPSED_TIME);
-  // printf("milisegundos = %d\n", milliSecondsSinceStart);
-  // seconds = milliSecondsSinceStart / 1000;
-  // diff = endSeconds - seconds;
-  // minutes = seconds / 60;
-  // seconds %= 60;
-  // milliSecondsSinceStart %= 1000;
-
-  // printf("%d:%d:%d\n", (diff / 60), (diff % 60), milliSecondsSinceStart);
   time(&end);
   diffAux = (int) difftime(end, start);
 
@@ -1277,12 +1304,6 @@ void mouseKeys(int btn, int state, int x, int y)
       }
       
       time(&start);
-      // minutes = 0;
-      // seconds = 0;
-      // endSeconds = endSecondsPattern;
-      // milliSecondsSinceStart = glutGet(GLUT_ELAPSED_TIME);
-      // printf("milisegundos = %d\n", milliSecondsSinceStart);
-      // endSeconds = (endSeconds + endMinutes * 60) - seconds;
       glutDisplayFunc(Desenha);
       return;
     }
@@ -1292,13 +1313,8 @@ void mouseKeys(int btn, int state, int x, int y)
 // Programa Principal
 int main(int argc, char **argv)
 {
-
-  // milliSecondsSinceStart = glutGet(GLUT_ELAPSED_TIME);
-  // printf("milisegundos = %d\n", milliSecondsSinceStart);
-
-  // endSeconds = (endSeconds + endMinutes * 60) - seconds;
   time(&start);
-  system("mpg123 Girls.mp3 &");
+  // system("mpg123 Girls.mp3 &");
   glutInit(&argc, argv);
   glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA);
   glutInitWindowPosition(5, 5); // Especifica a posição inicial da janela GLUT
