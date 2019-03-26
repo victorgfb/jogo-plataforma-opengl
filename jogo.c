@@ -99,6 +99,7 @@ void drawText(void *font, char *string)
 
 void loserWindow()
 {
+    acabou = 1;
     glutPostRedisplay();
     glutSwapBuffers();
 
@@ -125,6 +126,7 @@ void loserWindow()
 
 void fallWindow()
 {
+  acabou =1; 
   glutPostRedisplay();
   glutSwapBuffers();
 
@@ -600,9 +602,19 @@ void Inicializa(void)
 
 void desenhaTriangulo()
 {
-  tri.x1 = x1 + Tx - auxTx;
-  tri.x2 = x2 + Tx - auxTx;
 
+  if(Tx == 0 && auxTx > 0){
+    auxTx = 0;
+    Tx+= xStep;
+    countDir++;
+    tri.x1 = x1 + Tx;
+    tri.x2 = x2 + Tx;
+  }else{
+    tri.x1 = x1 + Tx - auxTx;
+    tri.x2 = x2 + Tx - auxTx;
+  }
+  printf("\n Tx = %d", x1); 
+  printf("\n auxtx = %d", x2); 
   //if(!colidiu){
   tri.y1 = y3 + Ty;
   tri.y2 = y4 + Ty;
@@ -942,7 +954,6 @@ void Desenha(void)
   paredes = coresParedes[0];
   fundo = coresFundo[0];
   objeto = coresObjeto[0];
-  printf("\n tx = %d", Tx);
   //Tx += xStep;
   // Muda para o sistema de coordenadas do modelo
   glMatrixMode(GL_MODELVIEW);
@@ -1241,7 +1252,7 @@ void Teclado(unsigned char key, int x, int y)
 
 void mouseKeys(int btn, int state, int x, int y)
 {
-  printf("%d, %d\n", x, y);
+  int j;
   if (btn == GLUT_LEFT_BUTTON)
   {
     if ((x >= 594 && x <= 739) && (y >= 543 && y <= 579))
@@ -1250,8 +1261,6 @@ void mouseKeys(int btn, int state, int x, int y)
       Ty = 0;
       animaX = 0;
       countDir = 0;
-      Tx = 0;
-      Ty = 0;
       pulando = 0;
       animaX = 0;
       acabou = 0;
@@ -1260,6 +1269,13 @@ void mouseKeys(int btn, int state, int x, int y)
       ladoPrecionado = 0;
       esquerdaPrecionado = 0;
       i = 0;
+      
+      for(j = 0; j < nblocos; j++)
+      {
+        auxiliar[j] = 0;
+        aux1[j] = 0;
+      }
+      
       time(&start);
       // minutes = 0;
       // seconds = 0;
