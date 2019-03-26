@@ -39,7 +39,7 @@ int maxPoints = 200;
 // int milliSecondsSinceStart;
 /* fim-teste-cronometro */
 int audio = 1;
-static GLuint texturasObjeto[16];
+static GLuint texturasObjeto[26];
 static GLuint texture = 0;
 int auxiliar[nblocos];
 int aux1[nblocos];
@@ -456,7 +456,7 @@ int detectaColisao(struct objeto linha)
 
 void carregarImagens(void)
 {
-  glGenTextures(15, texturasObjeto);
+  glGenTextures(25, texturasObjeto);
   carregarTextura(texturasObjeto[0], "imagem/sprite_05.png");
   carregarTextura(texturasObjeto[1], "imagem/sprite_06.png");
   carregarTextura(texturasObjeto[2], "imagem/sprite_07.png");
@@ -472,6 +472,16 @@ void carregarImagens(void)
   carregarTextura(texturasObjeto[13], "imagem/sprite_16.png");
   carregarTextura(texturasObjeto[14], "imagem/tutorial.png");
   carregarTextura(texturasObjeto[15], "imagem/tutorial2.png");
+  carregarTextura(texturasObjeto[16], "imagem/sprite_17.png");
+  carregarTextura(texturasObjeto[17], "imagem/sprite_18.png");
+  carregarTextura(texturasObjeto[18], "imagem/sprite_19.png");
+  carregarTextura(texturasObjeto[19], "imagem/sprite_20.png");
+  carregarTextura(texturasObjeto[20], "imagem/sprite_21.png");
+  carregarTextura(texturasObjeto[21], "imagem/sprite_22.png");
+  carregarTextura(texturasObjeto[22], "imagem/sprite_23.png");
+  carregarTextura(texturasObjeto[23], "imagem/sprite_24.png");
+  carregarTextura(texturasObjeto[24], "imagem/sprite_25.png");
+  carregarTextura(texturasObjeto[25], "imagem/sprite_26.png");
   carregarTextura(texturasObjeto[7], "imagem/sprite_00.png");
 }
 
@@ -836,7 +846,7 @@ void desenhaTriangulo()
 void desenhaFundos()
 {
   //DESENHA FUNDO DO JOGO
-  glBindTexture(GL_TEXTURE_2D, texturasObjeto[6]);
+  glBindTexture(GL_TEXTURE_2D, texturasObjeto[16]);
   glColor3f(0, 0, 0);
   glEnable(GL_BLEND);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -866,6 +876,8 @@ void desenhaFundos()
   glVertex2f(115 - animaX, 115);
   glEnd();
 
+  glBindTexture(GL_TEXTURE_2D, texturasObjeto[17]);
+  
   glEnable(GL_BLEND);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
   glEnable(GL_TEXTURE_2D);
@@ -894,6 +906,8 @@ void desenhaFundos()
   glVertex2f(345 - animaX, 115);
   glEnd();
 
+  glBindTexture(GL_TEXTURE_2D, texturasObjeto[18]);
+  
   glEnable(GL_BLEND);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
   glEnable(GL_TEXTURE_2D);
@@ -922,6 +936,8 @@ void desenhaFundos()
   glVertex2f(575 - animaX, 115);
   glEnd();
 
+    glBindTexture(GL_TEXTURE_2D, texturasObjeto[19]);
+    
   glEnable(GL_BLEND);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
   glEnable(GL_TEXTURE_2D);
@@ -950,6 +966,8 @@ void desenhaFundos()
   glVertex2f(805 - animaX, 115);
   glEnd();
 
+  glBindTexture(GL_TEXTURE_2D, texturasObjeto[20]);
+    
   glEnable(GL_BLEND);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
   glEnable(GL_TEXTURE_2D);
@@ -977,6 +995,8 @@ void desenhaFundos()
   glTexCoord2f(0.0f, 1.0f);
   glVertex2f(1035 - animaX, 115);
   glEnd();
+  
+  glBindTexture(GL_TEXTURE_2D, texturasObjeto[21]);
 
   glEnable(GL_BLEND);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -1005,7 +1025,8 @@ void desenhaFundos()
   glTexCoord2f(0.0f, 1.0f);
   glVertex2f(1265 - animaX, 115);
   glEnd();
-
+  
+    glBindTexture(GL_TEXTURE_2D, texturasObjeto[22]);
   glEnable(GL_BLEND);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
   glEnable(GL_TEXTURE_2D);
@@ -1034,6 +1055,7 @@ void desenhaFundos()
   glVertex2f(1495 - animaX, 115);
   glEnd();
 
+    glBindTexture(GL_TEXTURE_2D, texturasObjeto[23]);
   glEnable(GL_BLEND);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
   glEnable(GL_TEXTURE_2D);
@@ -1062,6 +1084,7 @@ void desenhaFundos()
   glVertex2f(1725 - animaX, 115);
   glEnd();
 
+ glBindTexture(GL_TEXTURE_2D, texturasObjeto[24]);
   glEnable(GL_BLEND);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
   glEnable(GL_TEXTURE_2D);
@@ -1090,6 +1113,7 @@ void desenhaFundos()
   glVertex2f(1955 - animaX, 115);
   glEnd();
 
+    glBindTexture(GL_TEXTURE_2D, texturasObjeto[25]);
   glEnable(GL_BLEND);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
   glEnable(GL_TEXTURE_2D);
