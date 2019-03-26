@@ -281,15 +281,15 @@ void loserWindow()
     glClear(GL_COLOR_BUFFER_BIT);
 
     glColor3f(1, 0, 0);
-    glRasterPos2f(72, 80);
+    glRasterPos2f(72, 90);
 
     drawText(GLUT_BITMAP_TIMES_ROMAN_24, "Tempo esgotado. Que pena... ");
 
-        glRasterPos2f(50, 73);
+        glRasterPos2f(50, 83);
 
      drawText(GLUT_BITMAP_TIMES_ROMAN_24, " Você jamais vai morrer de fome.  Se tivesse ficado na comunidade, não estaria. [...]");
 
-    glRasterPos2f(20, 65);
+    glRasterPos2f(20, 75);
      
       drawText(GLUT_BITMAP_TIMES_ROMAN_24, " Se tivesse ficado lá, teria morrido de outras fomes. Teria vivido uma vida com fome de sentimentos, de cores, de amor.");
     glRasterPos2f(74, 60);
